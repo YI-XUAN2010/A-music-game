@@ -2,7 +2,7 @@
 <html lang="zh-Hant">
 <head>
     <!-- The page title will be set by JavaScript -->
-    <title>音符醬 (Version 2.0)</title>
+    <title>一個音樂遊戲 (v1.1)</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <!-- Google Fonts -->
@@ -14,7 +14,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
     <style>
         body { 
-            /* Unified Font Family */
             font-family: 'Poppins', 'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', 'Noto Sans KR', sans-serif;
             background-color: #111827; 
             color: #e5e7eb; 
@@ -150,96 +149,54 @@
         .xp-bar-container { width: 100%; background-color: #4b5563; border-radius: 9999px; overflow: hidden; height: 1.25rem; margin-top: 0.5rem;}
         .xp-bar { background-color: #a78bfa; height: 100%; width: 0%; transition: width 0.5s ease-out; text-align: center; color: white; font-size: 0.8rem; line-height: 1.25rem;}
         
-        /* Language Drawer Styles */
-        .language-drawer {
-            width: 100%;
-            position: relative;
-        }
-        summary.language-button {
+        /* Corner Buttons for Main Menu */
+        .bottom-corner-button {
+            position: absolute;
+            bottom: 1.5rem;
+            width: 50px;
+            height: 50px;
             background-color: #4b5563;
             color: white;
-            padding: 0.8rem 1.5rem;
-            border-radius: 9999px;
-            cursor: pointer;
-            list-style: none; /* Hide the default marker */
-            transition: background-color 0.2s;
-            font-weight: bold;
-            font-size: 1.5rem;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 64px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            pointer-events: auto;
+            z-index: 25;
+            border: none;
         }
-        summary.language-button::-webkit-details-marker {
-            display: none;
-        }
-        summary.language-button:hover {
+        .bottom-corner-button:hover {
             background-color: #6b7280;
         }
-        .language-options {
-            position: absolute;
-            left: 0;
-            right: 0;
-            background-color: #374151;
-            border: 1px solid #4b5563;
-            z-index: 40; /* Make sure it's on top */
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            pointer-events: auto; /* Enable clicks on options */
-        }
-        .language-options button {
-            background: none;
-            border: none;
-            color: #d1d5db;
-            padding: 0.75rem 1rem;
-            text-align: center;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1.1rem;
-        }
-        .language-options button:not(:last-child) {
-            border-bottom: 1px solid #4b5563;
-        }
-        .language-options button:hover {
-            background-color: #4b5563;
-        }
-        .language-options button.active {
-            background-color: #a78bfa;
-            color: white;
-            font-weight: bold;
-        }
+        #newsButton { left: 1.5rem; }
+        #languageButton { right: 1.5rem; }
 
-        /* Default: Dropdown */
-        .language-options {
-            top: 100%;
-            border-top: none;
-            border-bottom-left-radius: 0.5rem;
-            border-bottom-right-radius: 0.5rem;
-        }
-        .language-drawer[open] > summary.language-button {
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+        /* News Screen specific styles */
+        #newsScreen .news-content {
+            background-color: #374151;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            white-space: pre-wrap;
+            width: 100%;
+            max-width: 380px;
         }
         
-        /* Specific override for Start Screen: Pop-up */
-        #startScreen .language-options {
-            top: auto;
-            bottom: 100%;
-            border-bottom: none;
-            border-top: 1px solid #4b5563;
-            border-top-left-radius: 0.5rem;
-            border-top-right-radius: 0.5rem;
-            border-bottom-left-radius: 0;
-            border-bottom-right-radius: 0;
+        /* Language Selection Screen */
+        .language-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+            max-width: 380px;
         }
-        #startScreen .language-drawer[open] > summary.language-button {
-            border-top-left-radius: 0;
-            border-top-right-radius: 0;
-            border-bottom-left-radius: 9999px;
-            border-bottom-right-radius: 9999px;
+        .language-grid .overlay-button {
+            height: 80px;
         }
-
     </style>
 </head>
 <body>
@@ -269,18 +226,8 @@
             <div class="song-selection">
                 <h1 data-lang-key="gameTitle">音符醬</h1>
                 <p data-lang-key="startScreenPrompt">為了最好的遊戲體驗，請點擊開始</p>
-                <!-- Language drawer moved before the start button -->
-                <details class="language-drawer" id="startLanguageDrawer">
-                    <summary class="language-button" id="startLangBtn">語言</summary>
-                    <div class="language-options">
-                        <button data-lang="zh">繁體中文</button>
-                        <button data-lang="zh-CN">简体中文</button>
-                        <button data-lang="en">English</button>
-                        <button data-lang="ja">日本語</button>
-                        <button data-lang="ko">한국어</button>
-                    </div>
-                </details>
                 <button id="startButton" class="overlay-button main-setting-btn" data-lang-key="clickToStart">點擊以開始</button>
+                <button id="startLanguageButton" class="overlay-button secondary" data-lang-key="languageTitle" style="height: auto; padding: 0.5rem 1rem; font-size: 1.1rem; margin-top: 1rem;"></button>
             </div>
         </div>
         <div id="mainMenu" class="screen-overlay scrollable-menu hidden">
@@ -291,27 +238,34 @@
                 <button id="speedModeButton" class="overlay-button main-setting-btn" data-lang-key="speedModeButton">極限手速模式</button>
                 <button id="otherButton" class="overlay-button secondary main-setting-btn" data-lang-key="otherButton">其他</button>
             </div>
+            <!-- Corner Buttons -->
+            <button id="newsButton" class="bottom-corner-button" title="News">📰</button>
+            <button id="languageButton" class="bottom-corner-button" title="Language">🌐</button>
+        </div>
+        <div id="newsScreen" class="screen-overlay hidden scrollable-menu">
+            <div class="song-selection">
+                <h1 data-lang-key="newsTitle"></h1>
+                <p class="news-content" data-lang-key="newsContent"></p>
+                <button class="overlay-button secondary back-button" data-target="mainMenu" data-lang-key="back" style="margin-top:2rem;"></button>
+            </div>
         </div>
         <div id="otherMenu" class="screen-overlay hidden scrollable-menu">
             <div class="song-selection">
                 <h1 style="padding-top: 2rem;" data-lang-key="otherTitle">其他</h1>
-                
-                <details class="language-drawer" id="otherLanguageDrawer">
-                    <summary class="language-button" id="otherLangBtn">語言</summary>
-                    <div class="language-options">
-                        <button data-lang="zh">繁體中文</button>
-                        <button data-lang="zh-CN">简体中文</button>
-                        <button data-lang="en">English</button>
-                        <button data-lang="ja">日本語</button>
-                        <button data-lang="ko">한국어</button>
-                    </div>
-                </details>
-
                 <button id="playerButton" class="overlay-button main-setting-btn" data-lang-key="playerButton">玩家</button>
                 <button id="saveDataButton" class="overlay-button main-setting-btn" data-lang-key="saveDataButton">存檔管理</button>
                 <button id="modeMenuButton" class="overlay-button main-setting-btn" data-lang-key="modeMenuButton">遊戲模式</button>
                 <button id="vibrationMenuButton" class="overlay-button main-setting-btn" data-lang-key="vibrationMenuButton">震動設定</button>
                 <button class="overlay-button secondary back-button main-setting-btn" data-target="mainMenu" data-lang-key="backToMain">返回主選單</button>
+            </div>
+        </div>
+        <div id="languageMenu" class="screen-overlay hidden scrollable-menu">
+            <div class="song-selection">
+                <h1 data-lang-key="languageSelectionTitle"></h1>
+                <div class="language-grid" id="languageGrid">
+                    <!-- Language buttons will be populated by JS -->
+                </div>
+                <button id="languageBackBtn" class="overlay-button secondary back-button" data-target="mainMenu" data-lang-key="back" style="margin-top:2rem;"></button>
             </div>
         </div>
         <div id="modePopupMenu" class="screen-overlay hidden scrollable-menu">
@@ -422,12 +376,12 @@
     const TRANSLATIONS = {
         en: {
             langName: "English",
-            pageTitle: "A Music Game (v2.0)", gameTitle: "A Music Game", back: "Back", backToMain: "Main Menu", combo: "Combo", level: "Level {level}",
+            pageTitle: "A Music Game (v1.1)", gameTitle: "A Music Game", back: "Back", backToMain: "Main Menu", combo: "Combo", level: "Level {level}",
             startScreenPrompt: "For the best experience, please click to start.", clickToStart: "Click to Start", audioError: "Failed to start audio. Please check browser settings or refresh.",
             mainMenuPrompt: "Choose your game mode!", classicModeButton: "Classic Mode", speedModeButton: "Speed Mode", otherButton: "Other",
             otherTitle: "Other", languageTitle: "Language", playerButton: "Player", saveDataButton: "Save Data", modeMenuButton: "Game Mode", vibrationMenuButton: "Vibration",
             playerTitle: "Player", playerLevel: "Level:", playerExp: "EXP:", playerMaxLevel: "MAX LEVEL", classicHistory: "Classic Mode History", speedHistory: "Speed Mode History", highScore: "High Score:", highRank: "High Rank:", playCount: "Plays:", highCombo: "High Combo:", highBpm: "High BPM:",
-            saveDataTitle: "Save Management", saveDataPrompt: "Copy the key to back up, or paste a key to restore.", exportKey: "Export Key", importKey: "Import Key", exportSuccess: "Key copied to clipboard!", exportFail: "Failed to copy. Please copy manually.", importPrompt: "Please paste your save key:", importSuccess: "Save data imported!", importFail: "Import failed! Key is invalid or corrupted.", importConfirm: "Are you sure you want to overwrite current data? This action cannot be undone.",
+            saveDataTitle: "Save Management", saveDataPrompt: "Copy the key to back up, or paste a key to restore.", exportKey: "Export Key", importKey: "Import Key", exportSuccess: "Key copied to clipboard!", exportFail: "Failed to copy. Please copy manually.", importPrompt: "Please paste your save key:", importSuccess: "Save data imported!", importFail: "Import failed! Key is invalid or corrupted.", importWarningOldKey: "This save key appears to be older than your current progress. Overwrite anyway?",
             modeMenuTitle: "Game Mode", modeMenuPrompt: "Choose your preferred control method.", touchMode: "Mobile (Touch)", keyboardMode: "PC (Keyboard)", switchToTouch: "Switch to Mobile Mode", switchToKeyboard: "Switch to PC Mode",
             vibrationMenuTitle: "Vibration", vibrationMenuPrompt: "Choose your preferred vibration mode.", vibrationOnHit: "On Hit Only", vibrationFollowRhythm: "Follow Rhythm", off: "Off", weak: "Weak", strong: "Strong", moreInfo: "More Info", vibrationHelp: "Mostly supported on Android.\nNot supported on iOS/iPadOS/Windows/macOS.\nPlease disable silent mode.", vibrationNotSupported: "Vibration (Not Supported)",
             classicModeTitle: "Classic Mode", classicModePrompt: "Choose a song to begin!",
@@ -436,15 +390,16 @@
             gameOverTitleClassic: "Performance End", gameOverTitleSpeed: "Challenge Over", finalAccuracy: "Accuracy:", finalScore: "Score:", finalMaxCombo: "Max Combo:", finalBPM: "Max BPM:", expGained: "EXP Gained:",
             allPerfect: "All Perfect", fullCombo: "Full Combo",
             levelUpAlert: "Congratulations! You are now Level {level}!", unlockSong: "Congratulations! Unlocked song: \"{songName}\"!", unlockCondition: "Unlock Condition", unlockLevelRequirement: "Requires Level {level} to unlock.",
+            newsTitle: "Update v1.1", newsContent: "This version adds a news button, a language button, and more languages (Simplified Chinese, English, Japanese, Korean).", languageSelectionTitle: "Select Language",
         },
         zh: {
             langName: "繁體中文",
-            pageTitle: "音符醬 (v2.0)", gameTitle: "音符醬", back: "返回", backToMain: "返回主選單", combo: "連擊", level: "等級 {level}",
+            pageTitle: "音符醬 (v1.1)", gameTitle: "音符醬", back: "返回", backToMain: "返回主選單", combo: "連擊", level: "等級 {level}",
             startScreenPrompt: "為了最好的遊戲體驗，請點擊開始", clickToStart: "點擊以開始", audioError: "無法啟動音訊，請檢查瀏覽器設定或重整。",
             mainMenuPrompt: "選擇你的遊戲模式！", classicModeButton: "經典演奏模式", speedModeButton: "極限手速模式", otherButton: "其他",
             otherTitle: "其他", languageTitle: "語言", playerButton: "玩家", saveDataButton: "存檔管理", modeMenuButton: "遊戲模式", vibrationMenuButton: "震動設定",
             playerTitle: "玩家", playerLevel: "等級:", playerExp: "經驗值:", playerMaxLevel: "滿等", classicHistory: "經典演奏模式紀錄", speedHistory: "極限手速模式紀錄", highScore: "最高分:", highRank: "最高評級:", playCount: "遊玩次數:", highCombo: "最高 Combo:", highBpm: "最高 BPM:",
-            saveDataTitle: "存檔管理", saveDataPrompt: "複製金鑰備份，或貼上金鑰還原紀錄。", exportKey: "匯出金鑰", importKey: "匯入金鑰", exportSuccess: "金鑰已複製到剪貼簿！", exportFail: "複製失敗，請手動複製。", importPrompt: "請貼上您的存檔金鑰：", importSuccess: "存檔匯入成功！", importFail: "匯入失敗！此金鑰損壞或無效。", importConfirm: "您確定要用這個存檔覆蓋目前的遊戲紀錄嗎？此操作無法復原。",
+            saveDataTitle: "存檔管理", saveDataPrompt: "複製金鑰備份，或貼上金鑰還原紀錄。", exportKey: "匯出金鑰", importKey: "匯入金鑰", exportSuccess: "金鑰已複製到剪貼簿！", exportFail: "複製失敗，請手動複製。", importPrompt: "請貼上您的存檔金鑰：", importSuccess: "存檔匯入成功！", importFail: "匯入失敗！此金鑰損壞或無效。", importWarningOldKey: "該金鑰的紀錄偏舊，是否仍要覆蓋存檔？",
             modeMenuTitle: "遊戲模式", modeMenuPrompt: "選擇適合你的操作方式", touchMode: "手機觸控", keyboardMode: "電腦鍵盤", switchToTouch: "切換為手機模式", switchToKeyboard: "切換為電腦模式",
             vibrationMenuTitle: "震動設定", vibrationMenuPrompt: "選擇您偏好的震動模式", vibrationOnHit: "僅打擊時", vibrationFollowRhythm: "跟隨節奏", off: "關閉", weak: "弱", strong: "強", moreInfo: "更多說明", vibrationHelp: "Android系統大部分支援此模式。\niOS/iPadOS/Windows/macOS不支援。\n請關閉靜音模式。", vibrationNotSupported: "震動設定 (裝置不支援)",
             classicModeTitle: "經典演奏模式", classicModePrompt: "選擇一首歌曲開始挑戰！",
@@ -453,15 +408,16 @@
             gameOverTitleClassic: "演奏結束", gameOverTitleSpeed: "挑戰結束", finalAccuracy: "最終精準度:", finalScore: "最終分數:", finalMaxCombo: "最高 Combo:", finalBPM: "最高 BPM:", expGained: "獲得經驗:",
             allPerfect: "All Perfect", fullCombo: "Full Combo",
             levelUpAlert: "恭喜升級！你現在是等級 {level}！", unlockSong: "恭喜！已解鎖新歌曲「{songName}」！", unlockCondition: "解鎖條件", unlockLevelRequirement: "需要達到等級 {level} 才能解鎖。",
+            newsTitle: "更新版本 v1.1", newsContent: "該版本新增了消息鍵、語言鍵和更多語言（新增了簡體中文、英文、日文、韓文）。", languageSelectionTitle: "選擇語言",
         },
         'zh-CN': {
             langName: "简体中文",
-            pageTitle: "音符酱 (v2.0)", gameTitle: "音符酱", back: "返回", backToMain: "返回主菜单", combo: "连击", level: "等级 {level}",
+            pageTitle: "音符酱 (v1.1)", gameTitle: "音符酱", back: "返回", backToMain: "返回主菜单", combo: "连击", level: "等级 {level}",
             startScreenPrompt: "为获得最佳体验，请点击开始", clickToStart: "点击以开始", audioError: "无法启动音频，请检查浏览器设置或刷新。",
             mainMenuPrompt: "选择你的游戏模式！", classicModeButton: "经典演奏模式", speedModeButton: "极限手速模式", otherButton: "其他",
             otherTitle: "其他", languageTitle: "语言", playerButton: "玩家", saveDataButton: "存档管理", modeMenuButton: "游戏模式", vibrationMenuButton: "振动设置",
             playerTitle: "玩家", playerLevel: "等级:", playerExp: "经验值:", playerMaxLevel: "满级", classicHistory: "经典模式记录", speedHistory: "极限手速记录", highScore: "最高分:", highRank: "最高评级:", playCount: "游玩次数:", highCombo: "最高连击:", highBpm: "最高BPM:",
-            saveDataTitle: "存档管理", saveDataPrompt: "复制密钥备份，或粘贴密钥还原。", exportKey: "导出密钥", importKey: "导入密钥", exportSuccess: "密钥已复制到剪贴板！", exportFail: "复制失败，请手动复制。", importPrompt: "请输入您的存档密钥：", importSuccess: "存档导入成功！", importFail: "导入失败！密钥无效或损坏。", importConfirm: "您确定要覆盖当前数据吗？此操作无法撤销。",
+            saveDataTitle: "存档管理", saveDataPrompt: "复制密钥备份，或粘贴密钥还原。", exportKey: "导出密钥", importKey: "导入密钥", exportSuccess: "密钥已复制到剪贴板！", exportFail: "复制失败，请手动复制。", importPrompt: "请输入您的存档密钥：", importSuccess: "存档导入成功！", importFail: "导入失败！密钥无效或损坏。", importWarningOldKey: "该密钥的记录偏旧，是否仍要覆盖存档？",
             modeMenuTitle: "游戏模式", modeMenuPrompt: "选择你的操作方式", touchMode: "手机触控", keyboardMode: "电脑键盘", switchToTouch: "切换为手机模式", switchToKeyboard: "切换为电脑模式",
             vibrationMenuTitle: "振动设置", vibrationMenuPrompt: "选择您偏好的振动模式", vibrationOnHit: "仅打击时", vibrationFollowRhythm: "跟随节奏", off: "关闭", weak: "弱", strong: "强", moreInfo: "更多说明", vibrationHelp: "安卓系统大多支持此模式。\niOS/iPadOS/Windows/macOS不支持。\n请关闭静音模式。", vibrationNotSupported: "振动设置 (设备不支持)",
             classicModeTitle: "经典演奏模式", classicModePrompt: "选择一首歌曲开始挑战！",
@@ -470,15 +426,16 @@
             gameOverTitleClassic: "演奏结束", gameOverTitleSpeed: "挑战结束", finalAccuracy: "最终准确度:", finalScore: "最终分数:", finalMaxCombo: "最高连击:", finalBPM: "最高BPM:", expGained: "获得经验:",
             allPerfect: "All Perfect", fullCombo: "Full Combo",
             levelUpAlert: "恭喜升级！你现在是等级 {level}！", unlockSong: "恭喜！已解锁新歌曲《{songName}》！", unlockCondition: "解锁条件", unlockLevelRequirement: "需要达到等级 {level} 才能解锁。",
+            newsTitle: "更新版本 v1.1", newsContent: "该版本新增了消息键、语言键和更多语言（新增了简体中文、英文、日文、韩文）。", languageSelectionTitle: "选择语言",
         },
         ja: {
             langName: "日本語",
-            pageTitle: "音楽ゲーム (v2.0)", gameTitle: "音楽ゲーム", back: "戻る", backToMain: "メインメニューへ", combo: "コンボ", level: "レベル {level}",
+            pageTitle: "音楽ゲーム (v1.1)", gameTitle: "音楽ゲーム", back: "戻る", backToMain: "メインメニューへ", combo: "コンボ", level: "レベル {level}",
             startScreenPrompt: "最高の体験のために、クリックして開始してください。", clickToStart: "クリックして開始", audioError: "オーディオを開始できません。ブラウザの設定を確認するか、リフレッシュしてください。",
             mainMenuPrompt: "ゲームモードを選択してください！", classicModeButton: "クラシックモード", speedModeButton: "スピードモード", otherButton: "その他",
             otherTitle: "その他", languageTitle: "言語", playerButton: "プレイヤー", saveDataButton: "データ管理", modeMenuButton: "ゲームモード", vibrationMenuButton: "振動設定",
             playerTitle: "プレイヤー", playerLevel: "レベル:", playerExp: "経験値:", playerMaxLevel: "最大レベル", classicHistory: "クラシックモード記録", speedHistory: "スピードモード記録", highScore: "ハイスコア:", highRank: "最高ランク:", playCount: "プレイ回数:", highCombo: "最大コンボ:", highBpm: "最大BPM:",
-            saveDataTitle: "データ管理", saveDataPrompt: "キーをコピーしてバックアップするか、キーを貼り付けて復元します。", exportKey: "エクスポート", importKey: "インポート", exportSuccess: "キーがクリップボードにコピーされました！", exportFail: "コピーに失敗しました。手動でコピーしてください。", importPrompt: "セーブキーを貼り付けてください：", importSuccess: "データが正常にインポートされました！", importFail: "インポートに失敗しました！キーが無効か破損しています。", importConfirm: "現在のデータを上書きしますか？この操作は元に戻せません。",
+            saveDataTitle: "データ管理", saveDataPrompt: "キーをコピーしてバックアップするか、キーを貼り付けて復元します。", exportKey: "エクスポート", importKey: "インポート", exportSuccess: "キーがクリップボードにコピーされました！", exportFail: "コピーに失敗しました。手動でコピーしてください。", importPrompt: "セーブキーを貼り付けてください：", importSuccess: "データが正常にインポートされました！", importFail: "インポートに失敗しました！キーが無効か破損しています。", importWarningOldKey: "このセーブキーの記録は現在より古いです。上書きしますか？",
             modeMenuTitle: "ゲームモード", modeMenuPrompt: "操作方法を選択してください", touchMode: "モバイル (タッチ)", keyboardMode: "PC (キーボード)", switchToTouch: "モバイルモードに切替", switchToKeyboard: "PCモードに切替",
             vibrationMenuTitle: "振動設定", vibrationMenuPrompt: "振動モードを選択してください", vibrationOnHit: "ヒット時のみ", vibrationFollowRhythm: "リズムに合わせる", off: "オフ", weak: "弱", strong: "強", moreInfo: "詳細", vibrationHelp: "主にAndroidでサポートされています。\niOS/iPadOS/Windows/macOSではサポートされていません。\nサイレントモードをオフにしてください。", vibrationNotSupported: "振動 (非対応)",
             classicModeTitle: "クラシックモード", classicModePrompt: "曲を選んで挑戦しよう！",
@@ -487,23 +444,25 @@
             gameOverTitleClassic: "演奏終了", gameOverTitleSpeed: "チャレンジ終了", finalAccuracy: "最終精度:", finalScore: "最終スコア:", finalMaxCombo: "最大コンボ:", finalBPM: "最大BPM:", expGained: "獲得経験値:",
             allPerfect: "オールパーフェクト", fullCombo: "フルコンボ",
             levelUpAlert: "レベルアップ！レベル {level}になりました！", unlockSong: "おめでとうございます！新しい曲「{songName}」がアンロックされました！", unlockCondition: "アンロック条件", unlockLevelRequirement: "アンロックするにはレベル {level} が必要です。",
+            newsTitle: "アップデート v1.1", newsContent: "このバージョンでは、お知らせボタン、言語ボタン、および多言語（簡体字中国語、英語、日本語、韓国語）が追加されました。", languageSelectionTitle: "言語を選択",
         },
         ko: {
             langName: "한국어",
-            pageTitle: "음악 게임 (v2.0)", gameTitle: "음악 게임", back: "뒤로", backToMain: "메인 메뉴로", combo: "콤보", level: "레벨 {level}",
-            startScreenPrompt: "최상의 경험을 위해 클릭하여 시작하세요.", clickToStart: "클릭하여 시작", audioError: "오디오를 시작할 수 없습니다. 브라우저 설정을 확인하거나 새로고침하세요.",
+            pageTitle: "음악 게임 (v1.1)", gameTitle: "음악 게임", back: "뒤로", backToMain: "메인 메뉴로", combo: "콤보", level: "레벨 {level}",
+            startScreenPrompt: "최상의 경험을 위해 클릭하여 시작하세요。", clickToStart: "클릭하여 시작", audioError: "오디오를 시작할 수 없습니다. 브라우저 설정을 확인하거나 새로고침하세요.",
             mainMenuPrompt: "게임 모드를 선택하세요!", classicModeButton: "클래식 모드", speedModeButton: "스피드 모드", otherButton: "기타",
             otherTitle: "기타", languageTitle: "언어", playerButton: "플레이어", saveDataButton: "데이터 관리", modeMenuButton: "게임 모드", vibrationMenuButton: "진동 설정",
             playerTitle: "플레이어", playerLevel: "레벨:", playerExp: "경험치:", playerMaxLevel: "최대 레벨", classicHistory: "클래식 모드 기록", speedHistory: "스피드 모드 기록", highScore: "최고 점수:", highRank: "최고 등급:", playCount: "플레이 횟수:", highCombo: "최대 콤보:", highBpm: "최대 BPM:",
-            saveDataTitle: "데이터 관리", saveDataPrompt: "키를 복사하여 백업하거나, 키를 붙여넣어 복원하세요.", exportKey: "내보내기", importKey: "가져오기", exportSuccess: "키가 클립보드에 복사되었습니다!", exportFail: "복사에 실패했습니다. 수동으로 복사해주세요.", importPrompt: "세이브 키를 붙여넣으세요:", importSuccess: "데이터를 성공적으로 가져왔습니다!", importFail: "가져오기 실패! 키가 유효하지 않거나 손상되었습니다。", importConfirm: "현재 데이터를 덮어쓰시겠습니까? 이 작업은 되돌릴 수 없습니다.",
+            saveDataTitle: "데이터 관리", saveDataPrompt: "키를 복사하여 백업하거나, 키를 붙여넣어 복원하세요.", exportKey: "내보내기", importKey: "가져오기", exportSuccess: "키가 클립보드에 복사되었습니다!", exportFail: "복사에 실패했습니다. 수동으로 복사해주세요.", importPrompt: "세이브 키를 붙여넣으세요:", importSuccess: "데이터를 성공적으로 가져왔습니다!", importFail: "가져오기 실패! 키가 유효하지 않거나 손상되었습니다。", importWarningOldKey: "이 세이브 키의 기록이 현재 진행 상황보다 오래되었습니다. 덮어쓰시겠습니까?",
             modeMenuTitle: "게임 모드", modeMenuPrompt: "선호하는 조작 방식을 선택하세요.", touchMode: "모바일 (터치)", keyboardMode: "PC (키보드)", switchToTouch: "모바일 모드로 전환", switchToKeyboard: "PC 모드로 전환",
-            vibrationMenuTitle: "진동 설정", vibrationMenuPrompt: "선호하는 진동 모드를 선택하세요.", vibrationOnHit: "히트 시에만", vibrationFollowRhythm: "리듬에 맞춰", off: "끄기", weak: "약하게", strong: "강하게", moreInfo: "추가 정보", vibrationHelp: "주로 안드로이드에서 지원됩니다.\niOS/iPadOS/Windows/macOS에서는 지원되지 않습니다.\n무음 모드를 비활성화하세요.", vibrationNotSupported: "진동 (미지원)",
+            vibrationMenuTitle: "진동 설정", vibrationMenuPrompt: "선호하는 진동 모드를 선택하세요.", vibrationOnHit: "히트 시에만", vibrationFollowRhythm: "리듬에 맞춰", off: "끄기", weak: "약하게", strong: "강하게", moreInfo: "추가 정보", vibrationHelp: "주로 안드로이드에서 지원됩니다.\niOS/iPadOS/Windows/macOS에서는 지원되지 않습니다.\n무음 모드를 비활성화하세요。", vibrationNotSupported: "진동 (미지원)",
             classicModeTitle: "클래식 모드", classicModePrompt: "도전할 곡을 선택하세요!",
             speedModeTitle: "스피드 모드", speedModePrompt: "BPM이 계속 증가합니다. 한계에 도전하세요!", speedFixed: "고정 챌린지", speedRandom: "랜덤 챌린지",
             pause: "일시정지", pauseTitle: "일시정지됨", resume: "계속하기", restart: "다시 시작", exit: "나가기", exitConfirm: "게임을 종료하시겠습니까?",
             gameOverTitleClassic: "연주 종료", gameOverTitleSpeed: "도전 종료", finalAccuracy: "최종 정확도:", finalScore: "최종 점수:", finalMaxCombo: "최대 콤보:", finalBPM: "최대 BPM:", expGained: "획득 경험치:",
             allPerfect: "올 퍼펙트", fullCombo: "풀 콤보",
-            levelUpAlert: "레벨 업! 이제 레벨 {level}입니다!", unlockSong: "축하합니다! 새로운 곡 '{songName}'이 잠금 해제되었습니다!", unlockCondition: "잠금 해제 조건", unlockLevelRequirement: "잠금을 해제하려면 레벨 {level}이 필요합니다.",
+            levelUpAlert: "레벨 업! 이제 레벨 {level}입니다!", unlockSong: "축하합니다! 새로운 곡 '{songName}'이 잠금 해제되었습니다!", unlockCondition: "잠금 해제 조건", unlockLevelRequirement: "잠금을 해제하려면 레벨 {level}이 필요합니다。",
+            newsTitle: "업데이트 v1.1", newsContent: "이 버전에는 뉴스 버튼, 언어 버튼 및 더 많은 언어(중국어 간체, 영어, 일본어, 한국어)가 추가되었습니다.", languageSelectionTitle: "언어 선택",
         }
     };
     
@@ -552,7 +511,6 @@
         constructor(gameInstance) {
             this.game = gameInstance;
             this.currentLanguage = 'zh'; // Default language
-            this.languageDrawers = document.querySelectorAll('.language-drawer');
         }
 
         init() {
@@ -565,17 +523,26 @@
             else if (browserLangMatch.startsWith('ko')) defaultLang = 'ko';
 
             this.setLanguage(savedLang || defaultLang, false);
-
-            this.languageDrawers.forEach(drawer => {
-                drawer.querySelectorAll('button[data-lang]').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        e.stopPropagation(); // Prevent the drawer from closing and re-opening
-                        this.setLanguage(e.currentTarget.dataset.lang);
-                        drawer.removeAttribute('open'); // Close drawer after selection
-                    });
-                });
+            this.populateLanguageMenu();
+        }
+        
+        populateLanguageMenu() {
+            const grid = document.getElementById('languageGrid');
+            grid.innerHTML = ''; // Clear existing
+            Object.keys(TRANSLATIONS).forEach(langCode => {
+                const langName = TRANSLATIONS[langCode].langName;
+                const button = document.createElement('button');
+                button.className = 'overlay-button';
+                button.dataset.lang = langCode;
+                button.textContent = langName;
+                button.onclick = () => {
+                    this.setLanguage(langCode);
+                    // Stay on the language screen
+                };
+                grid.appendChild(button);
             });
         }
+
 
         get(key, replacements = {}) {
             const langMap = TRANSLATIONS[this.currentLanguage] || TRANSLATIONS.en;
@@ -599,30 +566,19 @@
         }
 
         updateUI() {
-            // Update all elements with data-lang-key
             document.querySelectorAll('[data-lang-key]').forEach(el => {
                 const key = el.dataset.langKey;
                 el.textContent = this.get(key);
             });
-
-            // Update specific elements that need more logic
             document.title = this.get('pageTitle');
             this.game.ui.updateAllUnlocks(this.game.playerData.playerData);
             this.game.ui.updateKeyLabels(this.game.inputMode);
             this.game.ui.displayPlayerPage(this.game.playerData.playerData);
 
-            // Update language drawer buttons
-            this.languageDrawers.forEach(drawer => {
-                const summaryBtn = drawer.querySelector('summary');
-                if (summaryBtn) {
-                    summaryBtn.textContent = this.get('langName');
-                }
-                drawer.querySelectorAll('button[data-lang]').forEach(button => {
-                    button.classList.toggle('active', button.dataset.lang === this.currentLanguage);
-                });
+            document.querySelectorAll('#languageGrid button').forEach(button => {
+                 button.classList.toggle('secondary', button.dataset.lang !== this.currentLanguage);
             });
             
-            // Update vibration button text if not supported
             if (!this.game.supportsVibration) {
                  this.game.ui.dom.vibrationMenuButton.textContent = this.get('vibrationNotSupported');
             }
@@ -702,13 +658,14 @@
         cacheDOMElements() {
             const ids = [
                 'gameCanvas', 'scoreDisplay', 'comboDisplay', 'bpmDisplay', 'hitFeedback', 'startScreen', 'mainMenu', 'classicMenu', 
-                'speedMenu', 'otherMenu', 'modePopupMenu', 'vibrationPopupMenu', 'playerScreen', 'saveDataScreen', 'gameOverScreen', 'pauseOverlay', 
+                'speedMenu', 'otherMenu', 'languageMenu', 'newsScreen', 'modePopupMenu', 'vibrationPopupMenu', 'playerScreen', 'saveDataScreen', 'gameOverScreen', 'pauseOverlay', 
                 'countdownOverlay', 'progressBar', 'progressBarContainer', 'pauseButton', 'startButton', 'classicModeButton', 
                 'speedModeButton', 'otherButton', 'playerButton', 'saveDataButton', 'modeMenuButton', 'vibrationMenuButton', 
                 'vibrationHelpBtn', 'touchModeBtn', 'keyboardModeBtn', 'resumeButton', 'modeSwitchButton', 'pauseRestartButton', 
                 'exitButton', 'saveDataKey', 'exportSaveData', 'importSaveData', 'playerStatsContainer', 'historyContent', 
                 'gameOverTitle', 'rankDisplayContainer', 'rankDisplay', 'achievementDisplay', 'finalAccuracy', 'finalScore', 
-                'perfectCount', 'goodCount', 'missCount', 'finalMaxCombo', 'finalBpmLabel', 'finalBPM', 'expGained'
+                'perfectCount', 'goodCount', 'missCount', 'finalMaxCombo', 'finalBpmLabel', 'finalBPM', 'expGained',
+                'languageButton', 'newsButton', 'startLanguageButton', 'languageBackBtn'
             ];
             
             ids.forEach(id => this.dom[id] = document.getElementById(id));
@@ -744,14 +701,13 @@
         }
         
         showScreen(screenName) {
-            ['startScreen', 'mainMenu', 'classicMenu', 'speedMenu', 'otherMenu', 'modePopupMenu', 
+            ['startScreen', 'mainMenu', 'classicMenu', 'speedMenu', 'otherMenu', 'languageMenu', 'newsScreen', 'modePopupMenu', 
              'vibrationPopupMenu', 'playerScreen', 'saveDataScreen', 'gameOverScreen', 'pauseOverlay', 'countdownOverlay']
             .forEach(name => {
                 if(this.dom[name]) this.dom[name].classList.add('hidden');
             });
             if (this.dom[screenName]) {
                 this.dom[screenName].classList.remove('hidden');
-                // When showing player screen, explicitly update its content
                 if (screenName === 'playerScreen') {
                     this.displayPlayerPage(this.game.playerData.playerData);
                 }
@@ -871,7 +827,6 @@
             const currentLang = lang.currentLanguage;
 
             const setupButton = (button, isUnlocked, unlockLevel, startFn) => {
-                // To prevent event listener stacking, clone the button and replace it
                 const newButton = button.cloneNode(true);
                 button.parentNode.replaceChild(newButton, button);
 
@@ -890,7 +845,6 @@
                 return newButton;
             };
 
-            // Re-select buttons as they might be replaced
             this.dom.classicSongButtons = document.querySelectorAll('#classicMenu [data-song]');
             this.dom.classicSongButtons.forEach(button => {
                 const songId = button.dataset.song;
@@ -1087,6 +1041,13 @@
             }
         }
 
+        calculateProgressScore(data) {
+            if (!data || typeof data.level === 'undefined' || typeof data.exp === 'undefined') {
+                return 0;
+            }
+            return (data.level * 100000) + data.exp;
+        }
+
         importFromKey(key) {
             try {
                 const decodedString = decodeURIComponent(atob(key));
@@ -1094,14 +1055,29 @@
                 if (!importedData || typeof importedData.level === 'undefined') {
                     throw new Error('Invalid key format');
                 }
-                if(confirm(this.game.lang.get('importConfirm'))) {
+
+                const currentScore = this.calculateProgressScore(this.playerData);
+                const importedScore = this.calculateProgressScore(importedData);
+                const importedVersion = importedData.version || 2; 
+
+                const proceedWithImport = () => {
                     this.playerData = { ...this.getDefaultData(), ...importedData };
                     this.save();
                     return true;
                 }
-                return false;
+
+                if (importedVersion < CONSTANTS.CURRENT_VERSION || importedScore < currentScore) {
+                    if (confirm(this.game.lang.get('importWarningOldKey'))) {
+                        return proceedWithImport();
+                    }
+                    return false;
+                } else {
+                    return proceedWithImport();
+                }
+
             } catch (e) {
                 console.error('Import failed:', e);
+                alert(this.game.lang.get('importFail'));
                 return false;
             }
         }
@@ -1122,6 +1098,7 @@
             this.gameMode = null; // 'CLASSIC' or 'SPEED'
             this.currentSongId = null;
             this.speedModeType = null;
+            this.languageMenuReturnTarget = 'startScreen'; // Default return target
             this.resetGameStats();
             this.supportsVibration = 'vibrate' in navigator;
         }
@@ -1151,6 +1128,19 @@
             this.ui.dom.classicModeButton.addEventListener('click', () => this.ui.showScreen('classicMenu'));
             this.ui.dom.speedModeButton.addEventListener('click', () => this.ui.showScreen('speedMenu'));
             this.ui.dom.otherButton.addEventListener('click', () => this.ui.showScreen('otherMenu'));
+            
+            // Language & News Buttons
+            this.ui.dom.startLanguageButton.addEventListener('click', () => {
+                this.languageMenuReturnTarget = 'startScreen';
+                this.ui.dom.languageBackBtn.dataset.target = this.languageMenuReturnTarget;
+                this.ui.showScreen('languageMenu');
+            });
+            this.ui.dom.languageButton.addEventListener('click', () => {
+                this.languageMenuReturnTarget = 'mainMenu';
+                this.ui.dom.languageBackBtn.dataset.target = this.languageMenuReturnTarget;
+                this.ui.showScreen('languageMenu');
+            });
+            this.ui.dom.newsButton.addEventListener('click', () => this.ui.showScreen('newsScreen'));
             
             this.ui.dom.backButtons.forEach(btn => btn.addEventListener('click', (e) => this.ui.showScreen(e.currentTarget.dataset.target)));
             this.ui.dom.homeButtons.forEach(btn => btn.addEventListener('click', (e) => this.goHome(e.currentTarget.dataset.target)));
@@ -1552,15 +1542,12 @@
             const key = prompt(this.lang.get('importPrompt'));
             if (key) {
                 if (this.playerData.importFromKey(key)) {
-                    // After successful import, we need to update settings based on new data
-                    this.lang.setLanguage(this.playerData.playerData.language || 'zh');
+                    this.lang.setLanguage(this.playerData.playerData.language || 'zh', false); // Set language without saving again
                     this.setVibrationMode(this.playerData.playerData.vibrationMode);
                     this.setInputMode(this.playerData.playerData.inputMode);
                     this.ui.updateAllUnlocks(this.playerData.playerData);
                     alert(this.lang.get('importSuccess'));
                     this.ui.showScreen('otherMenu');
-                } else {
-                    alert(this.lang.get('importFail'));
                 }
             }
         }
